@@ -1,0 +1,113 @@
+\documentclass[superscriptaddress,aps,pra,nofootinbib,onecolumn,notitlepage,10pt]{revtex4-1}
+\pdfoutput=1
+\usepackage{graphicx}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{comment}
+\usepackage{placeins}
+\usepackage[caption=false]{subfig}
+\usepackage[colorlinks]{hyperref}
+\usepackage{hypcap}
+\usepackage{dsfont}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\newcommand{\eq}[1]{Eq.~\hyperref[eq:#1]{(\ref*{eq:#1})}}
+\renewcommand{\sec}[1]{\hyperref[sec:#1]{Section~\ref*{sec:#1}}}
+\newcommand{\app}[1]{\hyperref[app:#1]{Appendix~\ref*{app:#1}}}
+\newcommand{\tab}[1]{\hyperref[tab:#1]{Table~\ref*{tab:#1}}}
+\newcommand{\fig}[1]{\hyperref[fig:#1]{Figure~\ref*{fig:#1}}}
+\newcommand{\figa}[2]{\hyperref[fig:#1]{Figure~\ref*{fig:#1}#2}}
+\newcommand{\figx}[2]{\hyperref[fig:#1]{Figure~\ref*{fig:#1}(#2)}}
+\newcommand{\thm}[1]{\hyperref[thm:#1]{Theorem~\ref*{thm:#1}}}
+\newcommand{\lem}[1]{\hyperref[lem:#1]{Lemma~\ref*{lem:#1}}}
+\newcommand{\cor}[1]{\hyperref[cor:#1]{Corollary~\ref*{cor:#1}}}
+\newcommand{\defn}[1]{\hyperref[def:#1]{Definition~\ref*{def:#1}}}
+\newcommand{\alg}[1]{\hyperref[alg:#1]{Algorithm~\ref*{alg:#1}}}
+
+\DeclareMathOperator*{\argmin}{\arg\!\min}
+\newcommand{\tr}{\operatorname{Tr}}
+\def\avg#1{\mathinner{\langle{#1}\rangle}}
+\def\bra#1{\mathinner{\langle{#1}|}}
+\def\ket#1{\mathinner{|{#1}\rangle}}
+\newcommand{\braket}[2]{\langle #1|#2\rangle}
+\newcommand{\proj}[1]{\ket{#1}\!\!\bra{#1}}
+
+\newcommand\R{{\mathrm {I\!R}}}
+\newcommand\N{{\mathrm {I\!N}}}
+\newcommand\h{{\cal H}}
+\newcommand\V{{\cal V}}
+\newcommand\p{{\sf p}}
+\newcommand\w{{\sf w}}
+
+%\newcommand{\qed}{$\hfill \Box$}
+\newcommand\diag{{\mbox{diag\,}}}
+\def\half{\tfrac{1}{2}}
+\newcommand{\ignore}[1]{}
+
+\newcommand{\ra}{{\rightarrow}}
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
+\newcommand{\ba}{\begin{eqnarray}}
+\newcommand{\ea}{\end{eqnarray}}
+
+\newcommand{\nn}{\nonumber \\}
+\newcommand{\kets}[1]{ |{#1} \rangle}
+\newcommand{\herr}{\gamma}
+\newcommand{\segs}{{ T}}
+\newcommand{\mE}{{\mathbb E}}
+\newcommand{\select}[1]{\textrm{select}(#1)}
+
+\newcommand{\rad}{\xi}
+\newcommand{\bs}[1]{\boldsymbol{#1}}
+\newcommand{\wcomp}{\widetilde{\cal O}(N)}
+
+\newcommand{\blu}{\color{blue}}
+\newcommand{\blk}{\color{black}}
+\newcommand{\red}{\color{red}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{definition}{Definition}
+\newtheorem{corollary}{Corollary}
+
+
+% In case you want to swap \lambda and \Lambda
+%\let\foo\lambda
+%\let\lambda\Lambda
+%\let\Lambda\foo
+
+%\input{Qcircuit}
+\begin{document}
+\title{Control Capacities for Quantum Systems}
+\begin{abstract}
+Abstract
+\end{abstract}
+\maketitle
+\section{Introduction}
+\section{Problem Statement}
+\section{Example}
+As a first explanatory example, let us assume that we have a quantum system that we wish to calibrate to perform the identity gate on a single qubit: $\openone : \ket{\psi} \mapsto \ket{\psi}~\forall \ket{\psi}\in \mathbb{C}^2$.  Instead of implementing the identity gate, we implement $e^{i X(t) \sigma_Y} = \cos(X(t)) \openone + i\sin(X(t)) \sigma_Y$, where $\sigma_Y$ is the Pauli--Y operator.  Here $X(t)$ is a variable that describes the state of the quantum gate (ie the system Hamiltonian) and does not represent a quantum state inside the device.
+
+For simplicity we assume the following model for $X$:
+\begin{align}
+X(t+1) &= a X(t) + B(t) U(t),\nonumber\\
+Y(t)&=X(t).
+\end{align}
+Here $U(t)$ represents a control setting for the undesired frequency and $B(t)$ is a sequence of i.i.d. random variables with mean $\mu_B$ and variance $\sigma_B^2$ that model imperfections in the control settings.
+In other words, the gate error grows exponentially with time and we assume that in a single round of measurements we gain perfect information about the gate function.  Our aim is to stabilize the system in the mean-square sense.  This is possible if $a < \sqrt{1+ \frac{\mu_B^2}{\sigma_B^2}}$ as per the work of Gireeja et al~\cite{}.
+
+To see this, let us use a linear strategy for setting $U(t)$ that chooses $U(t) =k Y(t)$ for some constant $k$.  Then
+\begin{align}
+\mathbb{E}(X^2(t+1)) &= \mathbb{E}((a+kB(t))X^2(t))\nonumber\\
+&=(a^2+2ak\mu_B + k^2(\mu_B^2+\sigma_B^2))\mathbb{E}(X^2(t)).
+\end{align}
+Through calculus, it is then easy to see that the minima corresponds to $k = - \frac{a\mu_B}{\mu_B^2+\sigma_B^2}$.  Thus we find by substitution that the error growth constant is at most $1$ if $a < \sqrt{1+\mu_B^2/\sigma_B^2}$.
+
+This result can be generalized slightly.  Imagine that for fixed $X(t)$ we have that the measurement is distributed according to $Y(t)\sim P(Y(t)|X(t))$ where $P(Y(t)|X(t))$ has mean $\mathbb{E}(X(t))$ and variance $\sigma_E^2>0$.  Under these circumstances, we get the same condition for mean square stability: $a < \sqrt{1+ \frac{\mu_B^2}{\sigma_B^2}}$ but the asymptotic value of $X(t)$ is 
+$$
+\lim_{t\rightarrow \infty} \mathbb{E}(X^2(t))=\frac{a^2 \mu_B^2 \sigma_E^2}{(a^2-1)\sigma_B^2 - \mu_B^2}.
+$$
+This follows from going through the same math which leads to an inhomogenous, rather than a homogenous, first order recurrence relation for $\mathbb{E}(X^2(t))$.  The above term follows from this general solution.
+\end{document}
