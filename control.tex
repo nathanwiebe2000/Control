@@ -32,6 +32,7 @@
 \def\bra#1{\mathinner{\langle{#1}|}}
 \def\ket#1{\mathinner{|{#1}\rangle}}
 \newcommand{\braket}[2]{\langle #1|#2\rangle}
+\newcommand{\ketbra}[2]{|#1\rangle\!\langle#2|}
 \newcommand{\proj}[1]{\ket{#1}\!\!\bra{#1}}
 
 \newcommand\R{{\mathrm {I\!R}}}
@@ -86,28 +87,79 @@ Abstract
 \end{abstract}
 \maketitle
 \section{Introduction}
-\section{Problem Statement}
-\section{Example}
-As a first explanatory example, let us assume that we have a quantum system that we wish to calibrate to perform the identity gate on a single qubit: $\openone : \ket{\psi} \mapsto \ket{\psi}~\forall \ket{\psi}\in \mathbb{C}^2$.  Instead of implementing the identity gate, we implement $e^{i X(t) \sigma_Y} = \cos(X(t)) \openone + i\sin(X(t)) \sigma_Y$, where $\sigma_Y$ is the Pauli--Y operator.  Here $X(t)$ is a variable that describes the state of the quantum gate (ie the system Hamiltonian) and does not represent a quantum state inside the device.
+\section{Control capacity}
 
-For simplicity we assume the following model for $X$:
+\section{Quantum Control Capacities for Gaussian Quantum Mechanics}
+Our first example will consider calculating a second moment control capacity for a problem in Gaussian quantum mechanics.
+Such processes are vitally important in optics since Gaussian states represent the minimum uncertainty pure states
+of the electromagnetic field or equivalently harmonic oscillators.  Since any quantum process that maintains the Gaussian
+nature of the states can be classically simulated this means that we can analytically study such cases and properly deal
+with the complexities of measurement back action.
+
+We assume that the initial state for our control problem is, for some fixed $\sigma>0$
+\begin{equation}
+\ket{\psi} = \int_{-\infty}^\infty \frac{e^{-x^2/4\sigma^2}}{(2\pi \sigma^2)^{1/4}}\ket{x}\mathrm{d}x\label{eq:psi0}
+\end{equation}
+We further assume that the free evolultion of the system is given by the following kicked Hamiltonian,
+\begin{equation}
+H_{\rm free}(t) = \frac{p^2}{2m} - \sum_{n=-\infty}^\infty \delta(2t-2n) k x^2,
+\end{equation}
+which can be viewed as a linearization of the quantum kicked pendulum.  We choose this Hamiltonian because it leads to exponential instabilities
+in the system as time increases and also because the kicked nature of the evolution makes it analytically tractable.
+We assume that the correction is given by
+\begin{equation}
+H_{c}(t) = \sum_{n=-\infty}^\infty b_n \gamma_n p\delta(2t-[2n+1]).
+\end{equation}
+Here the $b_n$ are independent random variables with mean $\mu_b$ and variance $\sigma_b^2$.  The variables $\gamma_n$ will be chosen adaptively to stabilize the evolution of the state, by allowing $H_c(t)$ to translate the Gaussian back towards its rest configuration of $\bar{x} = \bra{\psi} x \ket{\psi}=0$.
+
+Feedback requires measurement, which we model via a non-destructive Gaussian measurement.  We specifically assume that the standard deviation of the Gaussian that's projected onto by the system has standard deviation $\sigma$ but make no assumptions about the input standard deviation, $\sigma_1$, since it will deviate from $\sigma$ due to the above dynamical map.
+The probability then of observing a mean value of $v_2$ given an initial Gaussian state with mean $\nu_1$ and variance $\sigma_1^2$ is
+\begin{equation}
+P(v_2,\sigma|v_1,\sigma_1) = \frac {{\rm e}^{-{\frac { \left( v_1-v_2 \right) ^{2}}{2\,{{
+\sigma_1}}^{2}+2\,{{\sigma}}^{2}}}}}{\sqrt {{{\sigma_1}}^{2}+{{\sigma}}^{2}}
+\sqrt {2\pi}}
+,
+\end{equation}
+which is to say that we measure the state in a non-orthogonal basis that is spanned by statees of the form of~\eq{psi0}.  The value of $y$ learned from this measurement specified
+the centroid of the Gaussian and allows us to discover how far the system has drifted from $\bar{x}=0$.  Also, because this form of measurement has a back action on the quantum state it captures the information disturbance feature of quantum mechanics (despite the fact that it nonetheless can be efficiently simulated by sampling).
+
+To be clear, our objective is to stabilize $\bar{x}$ in the mean-square sense.  In order to find a linear strategy to achieve this we need to first solve the quantum dynamics of the system.
+Because the map is periodic every $1$ unit of time, we only have to consider the dynamics within a single kick and feedback
+\begin{equation}
+\ket{\psi} \rightarrow e^{-i p^2/2m}e^{-ipb_n \gamma_n} e^{i kx^2}\ket{\psi},
+\end{equation}
+followed by a measurement operation.  Since $p= i\partial_x$, the action of these operators on a Gaussian state can be easily computed by Fourier transformation.  We specifically find that for
+\begin{equation}
+\ket{\psi(\nu)}:=\int_{-\infty}^\infty \frac{e^{-(x-\nu)^2/4\sigma^2}}{(2\pi \sigma^2)^{1/4}}\ket{x}\mathrm{d}x,
+\end{equation}
+that the probability density of a Gaussian with mean $\nu_1$ being measured as a Gaussian with mean $\nu_2$ is 
+\begin{equation}
+P(\nu_2,\sigma|\nu_1,\sigma_1) \propto e^{-\frac{2\sigma^2 m^2 \left(\nu_2 -\left (\nu_1 + \frac{(b_n\gamma_n)m + k\nu_1}{m}\right)\right)^2}{\sigma^4(4k^2+8km+8m^2)+1}}.
+\end{equation}
+The expected mean square error over all control settings is then for any linear strategy where $\gamma_n = \kappa \nu_1$ is
 \begin{align}
-X(t+1) &= a X(t) + B(t) U(t),\nonumber\\
-Y(t)&=X(t).
+&\mathbb{E}\left(\int_{-\infty}^\infty P(\nu_2,\sigma|\nu_1,\sigma_1) \nu_2^2\mathrm{d}\nu_2\right) \nonumber\\
+&\qquad\qquad= \frac{1}{2}\frac{(1+(4k^2+8km+8m^2)\sigma^4+2\nu_1^2((1+(\mu_b^2+\sigma_b^2)\kappa^2+2\mu_b\kappa)m^2+(2\kappa\mu_b+2)km+k^2)\sigma^2)}{m^2\sigma^2}\label{eq:mse}
 \end{align}
-Here $U(t)$ represents a control setting for the undesired frequency and $B(t)$ is a sequence of i.i.d. random variables with mean $\mu_B$ and variance $\sigma_B^2$ that model imperfections in the control settings.
-In other words, the gate error grows exponentially with time and we assume that in a single round of measurements we gain perfect information about the gate function.  Our aim is to stabilize the system in the mean-square sense.  This is possible if $a < \sqrt{1+ \frac{\mu_B^2}{\sigma_B^2}}$ as per the work of Gireeja et al~\cite{}.
+Calculus gives us that the optimal value of $\kappa$ for reducing the mean square error is
+\begin{equation}
+\kappa = \frac{-\mu_b(k+m)}{m(\mu_b^2 +\sigma_b^2)}.
+\end{equation}
+The initial mean-square error is $\nu_1^2 +\sigma^2$ before the kick operation is applied.  Thus by substituting the optimal value of $\kappa$ we see that the expected square error takes the form
+\begin{equation}
+\mathbb{E}_{b}\left(\int_{-\infty}^\infty P(\nu_2,\sigma|\nu_1,\sigma_1) \nu_2^2\mathrm{d}\nu_2\right) = C + \left(\frac{\sigma_b^2(k+m)^2}{m^2(\mu_b^2+\sigma_b^2)}\right)v_1^2,
+\end{equation}
+where $C$ is a constant function of $\nu_1$.
+Thus it follows that if we take the expectation value over all possible paths that lead from the initial state to the state $\nu_1$ we have that
+\begin{equation}
+\mathbb{E} \left(\mathbb{E}_{b}\left(\int_{-\infty}^\infty P(\nu_2,\sigma|\nu_1,\sigma_1) \nu_2^2\mathrm{d}\nu_2\right)\right) = C + \left(\frac{\sigma_b^2(k+m)^2}{m^2(\mu_b^2+\sigma_b^2)}\right)\mathbb{E}(v_1^2).
+\end{equation}
+Thus we are stable under repeated applications of this map if $\sigma_b < \frac{m\mu_b}{\sqrt{k^2 +2km}}$.  This value makes sense because as $k/m\rightarrow \infty$ we need to take $\sigma_b \rightarrow 0$ in order to control the system.  Furthermore, we also find that if $\mu_b=0$ we cannot control the system either because we cannot be sure that we will get the direction of the correction shifts of the Gaussian correct.
 
-To see this, let us use a linear strategy for setting $U(t)$ that chooses $U(t) =k Y(t)$ for some constant $k$.  Then
-\begin{align}
-\mathbb{E}(X^2(t+1)) &= \mathbb{E}((a+kB(t))X^2(t))\nonumber\\
-&=(a^2+2ak\mu_B + k^2(\mu_B^2+\sigma_B^2))\mathbb{E}(X^2(t)).
-\end{align}
-Through calculus, it is then easy to see that the minima corresponds to $k = - \frac{a\mu_B}{\mu_B^2+\sigma_B^2}$.  Thus we find by substitution that the error growth constant is at most $1$ if $a < \sqrt{1+\mu_B^2/\sigma_B^2}$.
+Thus the second moment quantum control capacity, when restricted to linear strategies, reduces for this problem to
+\begin{equation}
+C_2 = \frac{1}{2}\log \left(\left[\frac{m^2}{(k+m)^2}\right]\left[1+\frac{\mu_b^2}{\sigma_b^2} \right]\right).
+\end{equation}
+Note the similar form to the channel capacity of an AWGN channel, which is $\frac{1}{2} \log(1+P/N)$, where $N$ is the noise level and $P$ is the transmission power.
 
-This result can be generalized slightly.  Imagine that for fixed $X(t)$ we have that the measurement is distributed according to $Y(t)\sim P(Y(t)|X(t))$ where $P(Y(t)|X(t))$ has mean $\mathbb{E}(X(t))$ and variance $\sigma_E^2>0$.  Under these circumstances, we get the same condition for mean square stability: $a < \sqrt{1+ \frac{\mu_B^2}{\sigma_B^2}}$ but the asymptotic value of $X(t)$ is 
-$$
-\lim_{t\rightarrow \infty} \mathbb{E}(X^2(t))=\frac{a^2 \mu_B^2 \sigma_E^2}{(a^2-1)\sigma_B^2 - \mu_B^2}.
-$$
-This follows from going through the same math which leads to an inhomogenous, rather than a homogenous, first order recurrence relation for $\mathbb{E}(X^2(t))$.  The above term follows from this general solution.
 \end{document}
