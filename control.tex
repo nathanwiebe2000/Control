@@ -9,7 +9,6 @@
 \usepackage[caption=false]{subfig}
 \usepackage[colorlinks]{hyperref}
 \usepackage{hypcap}
-\usepackage{dsfont}
 \usepackage{algorithm}
 \usepackage{algorithmic}
 
@@ -88,6 +87,30 @@ Abstract
 \maketitle
 \section{Introduction}
 \section{Control capacity}
+Control capacity provides a new way of looking at the stability of systems that builds a link between control and Shannon theory.  These links are especially evocative in quantum control because of the natural connections that occur between quantum feedback and quantum information theory.  Our goal here is to discuss how quantum control capacities can give a framework for providing a well-motivated capacity to a quantum feedback channel.
+
+For classical systems, the actuation channel provides perhaps the most concise model for probing control capacities.  In an actualtion channel one has a system that has a state, $X$, which drifts over time either deterministically or randomly with the time $t$.  In order to perform feedback, information has to be extracted from a system.  This is achieved by function $Y(t)$, which gives an estimate of the current state of the system.  Feedback then is performed by performing an intervention on the system $U(t)$, which is determined implicitly by the output of $Y(t)$.  As a concrete example, consider the following actuation channel
+
+\begin{align}
+X(t+1) &= aX(t) + b(t)U(t),\nonumber\\
+Y(t) &= X(t)
+\end{align}
+Here $a>0$ describes the drift of the system, which leads to exponential divergence of the state were it not for feedback.  The quantity $b(t)$ is noise in the conrol.  The measurement, $Y(t)$, is assumed to be error-free in this example but more generally errors could be considered in the model.
+
+This model can be envisioned as a channel that maps the state $X(t)$ forward in time.  This allows us to define the capacity of a channel in terms of its ability to stabilize the moments of the of distribution of $X(t)$.  In particular, let us define $\eta^{\rm th}$ moment control capacity as
+
+\begin{equation}
+C_{\eta} :=\liminf_{t\rightarrow \infty} -\min_{U^{n-1}(\cdot)} \frac{1}{\eta t} \log\left(\left[\frac{X(t)}{X(0)}\right]^\eta \right),
+\end{equation}
+where the minimization over $U^{n-1}(\cdot)$ means that we optimize over all feedback strategies that are allowed within the framework.
+Here $C_{\eta}$ can be interpreted as the number of most significant bits of the uncertainty in the $\eta^{\rm th}$ moment of the variable $X$ that can be dissipated by the control and feedback.  In this sense, it has the interpretation of a capacity.
+
+There are several important values of $\eta$ for which $C_{\eta}$ is particularly significant.  The $\eta=2$ case corresponds to minimizing the second moment of the variable $X(t)$.  It is often the easiest to calculate and for this reason we focus on it in the subsequent examples.  $\lim_{\eta \rightarrow 0} C_{\eta}$ gives the Shannon control capacity, which is the weakest notion of control capacity.  The other extreme, $\lim_{\eta \rightarrow \infty} C_{\eta}$ is the zero--error control capacity.
+
+\subsection{Quantum Control Capacities}
+At a fundamental level the notion of a control capacity for quantum systems is no different than that of a control capacity for a classical system.  However, in practice the features of quantum mechanics can lead to some significant departures between the two in practice.  The first difference is what the notion of the state $X(t)$ represents.  In a classical system it usually represents a set of variables that describe the internal state of a system.  In quantum settings this is not usually possible because of the inability to cast quantum mechanics as a local hidden variable theory.  Thus we assume in this setting that if the quantum state $\ket{\psi(t)}$ represents the quantum state of a physical system, then the state $X(t)$ refers to some feature of either the quantum system or the dynamical map that the system evolves according to.
+
+The next issue is that, unlike the actuation channel considered above, quantum mechanics comes with it an information disturbance principle which prevents us from measuring the system without damaging the wave function.  For this reason, $Y(t)$ and $X(t)$ will often have non-trivial couplings.  This makes the identification of control capacities for quantum systems more subtle than their classical counterparts.  We examine such cases below for Gaussian quantum mechanics as well as quantum rotors in the large angular momentum limit.
 
 \section{Quantum Control Capacities for Gaussian Quantum Mechanics}
 Our first example will consider calculating a second moment control capacity for a problem in Gaussian quantum mechanics.
