@@ -125,9 +125,9 @@ We assume that the initial state for our control problem is, for some fixed $\si
 \end{equation}
 We further assume that the free evolultion of the system is given by the following kicked Hamiltonian,
 \begin{equation}
-H_{\rm free}(t) = \frac{p^2}{2m} - \sum_{n=-\infty}^\infty \delta(2t-2n) k x^2,
+H_{\rm free}(t) = \frac{\hat{p}^2}{2m} - \frac{1}{2}\sum_{n=-\infty}^\infty \delta(2t-2n) k \hat{x}^2,
 \end{equation}
-which can be viewed as a linearization of the quantum kicked pendulum.  We choose this Hamiltonian because it leads to exponential instabilities
+which can be viewed as a linearization of the quantum kicked pendulum.  Here $\hat{p} = i \partial_x$ is the momentum operator, $m$ is the mass of the particle, $\hat{x}$ is the position operator and $k$ is the strength of the force pushing the system away from $x=0$. We choose this Hamiltonian because it leads to exponential instabilities
 in the system as time increases and also because the kicked nature of the evolution makes it analytically tractable.
 We assume that the correction is given by
 \begin{equation}
@@ -148,20 +148,28 @@ the centroid of the Gaussian and allows us to discover how far the system has dr
 
 To be clear, our objective is to stabilize $\bar{x}$ in the mean-square sense.  In order to find a linear strategy to achieve this we need to first solve the quantum dynamics of the system.
 Because the map is periodic every $1$ unit of time, we only have to consider the dynamics within a single kick and feedback
-\begin{equation}
-\ket{\psi} \rightarrow e^{-i p^2/2m}e^{-ipb_n \gamma_n} e^{i kx^2}\ket{\psi},
-\end{equation}
-followed by a measurement operation.  Since $p= i\partial_x$, the action of these operators on a Gaussian state can be easily computed by Fourier transformation.  We specifically find that for
-\begin{equation}
-\ket{\psi(\nu)}:=\int_{-\infty}^\infty \frac{e^{-(x-\nu)^2/4\sigma^2}}{(2\pi \sigma^2)^{1/4}}\ket{x}\mathrm{d}x,
-\end{equation}
-that the probability density of a Gaussian with mean $\nu_1$ being measured as a Gaussian with mean $\nu_2$ is 
-\begin{equation}
-P(\nu_2,\sigma|\nu_1,\sigma_1) \propto e^{-\frac{2\sigma^2 m^2 \left(\nu_2 -\left (\nu_1 + \frac{(b_n\gamma_n)m + k\nu_1}{m}\right)\right)^2}{\sigma^4(4k^2+8km+8m^2)+1}}.
-\end{equation}
-The expected mean square error over all control settings is then for any linear strategy where $\gamma_n = \kappa \nu_1$ is
 \begin{align}
-&\mathbb{E}\left(\int_{-\infty}^\infty P(\nu_2,\sigma|\nu_1,\sigma_1) \nu_2^2\mathrm{d}\nu_2\right) \nonumber\\
+\ket{\psi} &\rightarrow e^{-i \hat{p}^2/2m}e^{-i\hat{p}b_n \gamma_n} e^{i k\hat{x}^2}\ket{\psi},
+\end{align}
+followed by a measurement operation.  Since $p=- i\partial_x$, the action of these operators on a Gaussian state can be easily computed by Fourier transformation, specifically $p=\mathcal{F} \hat{k} \mathcal{F}^{-1}$ where $\mathcal{F}$ is the unitary Fourier transformation operator and $k$ is a diagonal operator in this transformed basis that is entirely equivalent to $\hat{x}$ here (i.e. $\hat{k} \ket{k} = k\ket{k}$).  Using this trick we can write
+\begin{equation}
+e^{-i \hat{p}^2/2m}e^{-i\hat{p}b_n \gamma_n} e^{i k\hat{x}^2}=\mathcal{F}^{-1}e^{-i \hat{k}^2/2m}e^{-i\hat{k}b_n \gamma_n}\mathcal{F} e^{i k\hat{x}^2}.
+\end{equation}
+Thus the evolution for a single kicking period can be simulated by applying the phase rotation described by the kicking term, applying a Fourier transform, perform the control operation and the diffusion of the quantum system as phase rotations and then transform back to position basis by applying a Fourier transform.
+
+While there are many initial states that can be considered here, we focus on Gaussian initial states of the form
+\begin{equation}
+\ket{\psi(\nu,\sigma)}:=\int_{-\infty}^\infty \frac{e^{-(x-\nu)^2/4\sigma^2}}{(2\pi \sigma^2)^{1/4}}\ket{x}\mathrm{d}x.
+\end{equation}
+This can easily be seen to describe a Gaussian wave function with amplitude at position $x$ of $\braket{x}{\psi(\nu,\sigma)} = \frac{e^{-(x-\nu)^2/4\sigma^2}}{(2\pi \sigma^2)^{1/4}}$.  Thus $\nu$ describes the mean of the Gaussian probability distribution that results from squaring this amplitude and $\sigma^2$ its variance.  This is convenient because the Fourier transform maps Gaussian states to Gaussians and the remaining phase rotations $e^{ik\hat{x}^2/2}$, $e^{i\hat{k}^2/2m}$ and $e^{-i hat{k} b_n \gamma_n}$ merely perturb the mean and the covariance of the resultant Gaussians.
+
+The only operation that could potentially take us outside of this Gaussian family of wavefunctions is measurement.  However, by performing our measurement in an overcomplete basis of Gaussian functions that the probability density of a Gaussian with mean $\nu_1$ being measured as a Gaussian with mean $\nu_2$ is 
+\begin{equation}
+P(\nu_2,\sigma|\nu_1,\sigma_1) \propto \int_{-\infty}^\infty |\braket{\psi(\nu_2,\sigma)}{x}\braket{x}{\psi(\nu_1,\sigma_1)}|^2 \mathrm{d}x\propto  e^{-\frac{2\sigma^2 m^2 \left(\nu_2 -\left (\nu_1 + \frac{(b_n\gamma_n)m + k\nu_1}{m}\right)\right)^2}{\sigma^4(4k^2+8km+8m^2)+1}}.
+\end{equation}
+This gives us the probability distribution over the measured value of the mean, $\nu_2$, given that the system was initially prepared in a Gaussian with mean $\nu_1$ and variance $\sigma_1^2$.  We can compute the mean square error, over all possible resolutions of the noise, by noting that for any distribution, $P(x)$, with mean $\mu$ and variance $\sigma^2$ $\int_{-\infty}^\infty P(x)x^2 \mathrm{d}x = \mu^2 + \sigma^2$.  Using this fact in concert with the assumption that $\mathbb{E}_b (b_n) = \mu_b$ and $\mathbb{E}_b (b_n^2) = \mu_b^2 + \sigma_b^2$ we have that 
+\begin{align}
+&\mathbb{E}_b\left(\int_{-\infty}^\infty P(\nu_2,\sigma|\nu_1,\sigma_1) \nu_2^2\mathrm{d}\nu_2\right) \nonumber\\
 &\qquad\qquad= \frac{1}{2}\frac{(1+(4k^2+8km+8m^2)\sigma^4+2\nu_1^2((1+(\mu_b^2+\sigma_b^2)\kappa^2+2\mu_b\kappa)m^2+(2\kappa\mu_b+2)km+k^2)\sigma^2)}{m^2\sigma^2}\label{eq:mse}
 \end{align}
 Calculus gives us that the optimal value of $\kappa$ for reducing the mean square error is
@@ -170,12 +178,12 @@ Calculus gives us that the optimal value of $\kappa$ for reducing the mean squar
 \end{equation}
 The initial mean-square error is $\nu_1^2 +\sigma^2$ before the kick operation is applied.  Thus by substituting the optimal value of $\kappa$ we see that the expected square error takes the form
 \begin{equation}
-\mathbb{E}_{b}\left(\int_{-\infty}^\infty P(\nu_2,\sigma|\nu_1,\sigma_1) \nu_2^2\mathrm{d}\nu_2\right) = C + \left(\frac{\sigma_b^2(k+m)^2}{m^2(\mu_b^2+\sigma_b^2)}\right)v_1^2,
+\mathbb{E}_{b}\left(\int_{-\infty}^\infty P(\nu_2,\sigma|\nu_1,\sigma_1) \nu_2^2\mathrm{d}\nu_2\right) = C + \left(\frac{\sigma_b^2(k+m)^2}{m^2(\mu_b^2+\sigma_b^2)}\right)\mathbb{E}(v_1^2),
 \end{equation}
 where $C$ is a constant function of $\nu_1$.
 Thus it follows that if we take the expectation value over all possible paths that lead from the initial state to the state $\nu_1$ we have that
 \begin{equation}
-\mathbb{E} \left(\mathbb{E}_{b}\left(\int_{-\infty}^\infty P(\nu_2,\sigma|\nu_1,\sigma_1) \nu_2^2\mathrm{d}\nu_2\right)\right) = C + \left(\frac{\sigma_b^2(k+m)^2}{m^2(\mu_b^2+\sigma_b^2)}\right)\mathbb{E}(v_1^2).
+\mathbb{E}_{v_1} \left(\mathbb{E}_{b}\left(\int_{-\infty}^\infty P(\nu_2,\sigma|\nu_1,\sigma_1) \nu_2^2\mathrm{d}\nu_2\right)\right) = C + \left(\frac{\sigma_b^2(k+m)^2}{m^2(\mu_b^2+\sigma_b^2)}\right)\mathbb{E}(v_1^2).
 \end{equation}
 Thus we are stable under repeated applications of this map if $\sigma_b < \frac{m\mu_b}{\sqrt{k^2 +2km}}$.  This value makes sense because as $k/m\rightarrow \infty$ we need to take $\sigma_b \rightarrow 0$ in order to control the system.  Furthermore, we also find that if $\mu_b=0$ we cannot control the system either because we cannot be sure that we will get the direction of the correction shifts of the Gaussian correct.
 
